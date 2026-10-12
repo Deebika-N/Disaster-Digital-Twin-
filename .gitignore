@@ -6,9 +6,27 @@ backend/node_modules/
 .env
 .env.*
 !.env.example
+.env.local
+.env.development
+.env.production
+.env.test
+.env.*.local
 backend/.env
 backend/.env.*
 !backend/.env.example
+backend/.env.local
+backend/.env.development
+backend/.env.production
+backend/.env.test
+backend/.env.*.local
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+frontend/.env.local
+frontend/.env.development
+frontend/.env.production
+frontend/.env.test
+frontend/.env.*.local
 
 # Logs
 logs/
