@@ -20,6 +20,18 @@ import { LoadingSkeleton } from '../common/LoadingSkeleton';
 import { ErrorBanner } from '../common/ErrorBanner';
 import { EmptyState } from '../common/EmptyState';
 
+const getDamageK = (record: DisasterRecord): number | undefined => {
+  const reportedDamage = record["Total Damage ('000 US$)"];
+  if (typeof reportedDamage === 'number' && Number.isFinite(reportedDamage)) {
+    return reportedDamage;
+  }
+
+  const adjustedDamage = record["Total Damage, Adjusted ('000 US$)"];
+  return typeof adjustedDamage === 'number' && Number.isFinite(adjustedDamage)
+    ? adjustedDamage
+    : undefined;
+};
+
 export const DisasterRecordsSection: React.FC = () => {
   const [records, setRecords] = useState<DisasterRecord[]>([]);
   const [totalRecords, setTotalRecords] = useState<number>(0);
@@ -47,6 +59,7 @@ export const DisasterRecordsSection: React.FC = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const hasDamageData = records.some((record) => getDamageK(record) !== undefined);
 
   // Load dropdown filter metadata once
   useEffect(() => {
@@ -293,7 +306,9 @@ export const DisasterRecordsSection: React.FC = () => {
                   <th className="py-3 px-4">Year</th>
                   <th className="py-3 px-4 text-right">Fatalities</th>
                   <th className="py-3 px-4 text-right">Total Affected</th>
-                  <th className="py-3 px-4 text-right">Damage (USD)</th>
+                  {hasDamageData && (
+                    <th className="py-3 px-4 text-right">Damage (USD)</th>
+                  )}
                   <th className="py-3 px-4 text-center">Action</th>
                 </tr>
               </thead>
@@ -332,11 +347,16 @@ export const DisasterRecordsSection: React.FC = () => {
                     <td className="py-3 px-4 text-right font-mono text-slate-300">
                       {(r['Total Affected'] || 0).toLocaleString()}
                     </td>
-                    <td className="py-3 px-4 text-right font-mono text-teal-300">
-                      {r["Total Damage ('000 US$)"]
-                        ? `$${((r["Total Damage ('000 US$)"] * 1000) / 1e6).toFixed(1)}M`
-                        : '—'}
-                    </td>
+                    {hasDamageData && (
+                      <td className="py-3 px-4 text-right font-mono text-teal-300">
+                        {(() => {
+                          const damageK = getDamageK(r);
+                          return damageK === undefined
+                            ? '—'
+                            : `$${((damageK * 1000) / 1e6).toFixed(1)}M`;
+                        })()}
+                      </td>
+                    )}
                     <td className="py-3 px-4 text-center">
                       <button
                         onClick={() => handleInspect(r._id)}
@@ -458,8 +478,8 @@ export const DisasterRecordsSection: React.FC = () => {
                   <div className="bg-midnight-850 p-3 rounded-lg border border-midnight-750">
                     <div className="text-[10px] text-slate-400 uppercase font-mono">Reported Loss</div>
                     <div className="text-base font-bold font-mono text-blue-300 mt-1">
-                      {detailRecord["Total Damage ('000 US$)"]
-                        ? `$${detailRecord["Total Damage ('000 US$)"].toLocaleString()}k`
+                      {getDamageK(detailRecord) !== undefined
+                        ? `$${getDamageK(detailRecord)?.toLocaleString()}k`
                         : 'N/A'}
                     </div>
                   </div>
