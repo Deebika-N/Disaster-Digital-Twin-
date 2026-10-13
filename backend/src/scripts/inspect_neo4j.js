@@ -5,10 +5,15 @@
 require("dotenv").config({ path: require("path").join(__dirname, "../../.env") });
 const neo4j = require("neo4j-driver");
 
-const URI = process.env.NEO4J_URI || "neo4j+s://5590d52a.databases.neo4j.io";
-const USERNAME = process.env.NEO4J_USERNAME || "5590d52a";
-const PASSWORD =
-  process.env.NEO4J_PASSWORD || "kpaMuKI0oZtHl_jUqbP9p6udfuytRlN_k6U3n4CVYbI";
+const URI = process.env.NEO4J_URI;
+const USERNAME = process.env.NEO4J_USERNAME;
+const PASSWORD = process.env.NEO4J_PASSWORD;
+
+if (!URI || !USERNAME || !PASSWORD) {
+  throw new Error(
+    "NEO4J_URI, NEO4J_USERNAME, and NEO4J_PASSWORD must be set in backend/.env."
+  );
+}
 
 async function run(driver, query, params = {}) {
   const session = driver.session();
@@ -137,4 +142,3 @@ inspect().catch((err) => {
   console.error("❌ Error:", err.message);
   process.exit(1);
 });
-
