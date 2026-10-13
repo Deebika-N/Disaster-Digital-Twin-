@@ -16,6 +16,7 @@ const notFound     = require("./middleware/notFound");
 const disasterRoutes  = require("./routes/disaster.routes");
 const analyticsRoutes = require("./routes/analytics.routes");
 const graphRoutes     = require("./routes/graph.routes");
+const xmlRoutes       = require("./routes/xml.routes");
 
 const app = express();
 
@@ -64,6 +65,7 @@ app.get("/health", (req, res) => {
 app.use("/api/v1/disasters",  disasterRoutes);   // MongoDB — disasters_normalized
 app.use("/api/v1/analytics",  analyticsRoutes);  // MongoDB aggregations + Neo4j
 app.use("/api/v1/graph",      graphRoutes);      // Neo4j graph queries
+app.use("/api/v1/xml",        xmlRoutes);        // RDF/XML export — read-only
 
 // ─── 404 / Error handling ─────────────────────────────────────────────────────
 app.use(notFound);
@@ -88,6 +90,9 @@ const startServer = async () => {
       logger.info(`   GET  /api/v1/analytics/heatmap   — choropleth data`);
       logger.info(`   GET  /api/v1/graph/overview       — Neo4j graph summary`);
       logger.info(`   GET  /api/v1/graph/country/:iso   — country graph node`);
+      logger.info(`   GET  /api/v1/xml/disaster/:disNo  — single record as RDF/XML`);
+      logger.info(`   GET  /api/v1/xml/export           — batch RDF/XML export`);
+      logger.info(`   GET  /api/v1/xml/validate/:disNo  — XML validation report`);
     });
 
     // Graceful shutdown
